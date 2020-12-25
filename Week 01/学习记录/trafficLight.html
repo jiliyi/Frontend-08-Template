@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>利用自己的思路写交通灯</title>
+    <style>
+      .container{
+        display: flex;
+      }
+      .circle{
+        width: 100px;
+        height: 100px;
+        border: 1px solid black;
+        border-radius: 50%;
+        margin: 0 20px;
+      }
+      .red.active{
+        background-color: red;
+      }
+      .green.active{
+        background-color: green;
+      }
+      .yellow.active{
+        background-color: yellow;
+      }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="circle red "></div>
+        <div class="yellow circle"></div>
+        <div class="green circle"></div>
+       
+    </div>
+    <script>
+      let red = document.querySelector('.red')
+      let green = document.querySelector('.green')
+      let yellow = document.querySelector('.yellow')
+
+      function removeActive(){
+        red.classList.remove('active');
+        green.classList.remove('active');
+        yellow.classList.remove('active')
+      }
+     
+      function delay(durtion){
+          return new Promise((reject)=>{
+            setTimeout(reject,durtion)
+          })
+     }
+
+     async function aa(){
+       removeActive()
+       green.classList.add('active')
+        await delay(10000)
+        removeActive()
+        yellow.classList.add('active');
+        await delay(2000)
+       removeActive()
+       red.classList.add('active')
+       delay(5000)
+       return true
+     }
+     aa()
+     setInterval(async ()=>{
+      aa()
+     },17000)
+    </script>
+</body>
+</html>
