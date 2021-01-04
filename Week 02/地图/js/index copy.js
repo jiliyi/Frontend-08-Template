@@ -28,35 +28,105 @@ function render(){
 }
 render()
 
-class Sorted{
+//二叉堆，保证每次取都取堆顶最小的
+class BinaryHeap{//
     constructor(arr,compare){
-        this.arr = arr.slice();
-        this.compare = compare || ((a,b)=> a-b);
+        this.arr = arr;
+        this.compare = compare || ((a,b)=>a-b)
     }
-
-    //每次都取这里面最小的数值
-    take(){
-        if(this.arr.length === 0){//数组为空
-            return
+    get length(){
+        return this.arr.length;
+    }
+    take(){//每次都拿最小的
+        if(this.length === 0){
+            return null
         }
-        //默认最小值第一项
-        let min = this.arr[0];
-        //最小值索引
-        let minIndex = 0;
-        for(let i = 0 ; i < this.arr.length;i++){//找到最小值及其索引
-            if(this.compare(min,this.arr[i]) > 0){
-                min = this.arr[i];
-                minIndex = i;
-            }
+        if(this.length === 1){
+            return this.arr[0]
         }
-        this.arr[minIndex] = this.arr[this.arr.length - 1];//将数组最后一位换位置
+        let min = this.arr[0]
+        this.swap(0,this.length-1)
         this.arr.pop()
+        this.heapify(0)
         return min;
     }
     give(item){
-        this.arr.push(item)
+        this.arr.push(item);
+        this.up(this.length - 1);
+    }
+    heapify (i){//下滤
+        let leftIndex = this.getLeft(i)
+        let rightIndex = this.getRight(i)
+        let minIndex = i
+        if(leftIndex <= this.length - 1 && this.compare(this.arr[minIndex],this.arr[leftIndex]) >0 ){
+            minIndex = leftIndex 
+        }
+        if(rightIndex <= this.length - 1 && this.compare(this.arr[minIndex],this.arr[rightIndex])>0){
+            minIndex = rightIndex
+        }
+        if(minIndex !== i){//递归出口
+            this.swap(i,minIndex)
+            this.heapify(minIndex);
+        }
+    }
+    up(i){//上滤
+        if(i === 0){
+            return;//递归出口
+        }
+        // let now = this.arr[i];
+        let fathertIndex = this.getFather(i)
+        // let father = this.arr[fathertIndex];
+        if(this.compare(this.arr[fathertIndex],this.arr[i]) > 0){
+            this.swap(i,fathertIndex)
+            this.up(fathertIndex)
+        }
+    }
+    swap(i,j){//交换
+        let temp = this.arr[i]
+        this.arr[i] = this.arr[j];
+        this.arr[j] = temp;
+    }
+    getLeft(i){
+        return 2 * i + 1;
+    }
+    getRight(i){
+        return 2 * i + 2
+    }
+    getFather(i){
+        return Math.floor((i - 1) / 2)
     }
 }
+
+//常规数组结构
+// class Sorted{
+//     constructor(arr,compare){
+//         this.arr = arr.slice();
+//         this.compare = compare || ((a,b)=> a-b);
+//     }
+
+//     //每次都取这里面最小的数值
+//     take(){
+//         if(this.arr.length === 0){//数组为空
+//             return
+//         }
+//         //默认最小值第一项
+//         let min = this.arr[0];
+//         //最小值索引
+//         let minIndex = 0;
+//         for(let i = 0 ; i < this.arr.length;i++){//找到最小值及其索引
+//             if(this.compare(min,this.arr[i]) > 0){
+//                 min = this.arr[i];
+//                 minIndex = i;
+//             }
+//         }
+//         this.arr[minIndex] = this.arr[this.arr.length - 1];//将数组最后一位换位置
+//         this.arr.pop()
+//         return min;
+//     }
+//     give(item){
+//         this.arr.push(item)
+//     }
+// }
 
 //设置标识
 let mousedown = false;
@@ -82,11 +152,10 @@ function delay(durtion){
 
 //实现广度优先搜索,给定起点，终点，找到路径
 async function findPath(arr,start,end){
-    // debugger;
     function distance(point){
         return (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2
     }
-    let queue = new Sorted([start],(a,b)=>distance(a) - distance(b));
+    let queue = new BinaryHeap([start],(a,b)=>distance(a) - distance(b));
     let table = Object.create(arr) //创建一个地图坐标的副本，记录找到该路径的上一个点的坐标
     async function insert(x,y,prev){
         if(x <0 || x >= 100 || y < 0 || y >= 100){//边界直接终止
@@ -129,3 +198,6 @@ async function findPath(arr,start,end){
     }  
     return null  
 }
+lookfor.addEventListener('click',()=>{
+    findPath(mapArr,[0,0],[50,50])
+}) 

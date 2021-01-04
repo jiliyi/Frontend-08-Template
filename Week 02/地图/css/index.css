@@ -18,3 +18,9 @@
 .cell.block{
     background: black;
 }
+.btnwrapper{
+    width: 100px;
+    margin:0 auto;
+    top: 400px;
+    left: 20px;
+}
