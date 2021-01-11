@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="btn">获取最多字符及次数</button>
+    <p></p>
+    <script>
+        const $ = Symbol("$")//记录字符串出现次数的变量
+        class Trie{
+            constructor(){
+                this.root = Object.create(null)//存储字典树的对象，尽量保持干净
+            }
+            //该方法用于向字典树中插入一条字符串
+            insert(str){
+                let node = this.root //拿到字典树根节点指针
+                for(let prop of str){
+                    if( !(prop in node)){//如果在当前层级没有对应节点,创建该节点
+                        node[prop] = Object.create(null)
+                    }
+                    node = node[prop] //将指针向后移动，进入下次迭代
+                }
+                if( !($ in node)){//在最后节点没有发现$属性
+                     node[$] = 1
+                }else{
+                    node[$]++//发现有，次数加1
+                }
+            }
+            //该方法用于返回出现次数最多的字符和出现次数
+            most(){
+                let frequent = 0;//次数
+                let maxWord = '';//字符
+                let visit = (node,word)=>{
+                    if(node[$] && node[$] > frequent){
+                        frequent = node[$]
+                        maxWord = word
+                    }
+                    for (let prop in node){
+                        visit(node[prop],word + prop)
+                    }
+                }
+                visit(this.root,'')
+                return {
+                    maxWord,
+                    frequent
+                }
+            }
+        }
+        //创建指定长度的随机的由26个英文字母组合的字符串
+        function createRandomStr(length){
+            let str = ''
+            for(let i = 0 ; i < length;i++){
+                str += String.fromCharCode(Math.random() * 26 + 'a'.charCodeAt(0))
+            }
+            return str;
+        }
+ 
+        btn.onclick = function(){
+
+            let trie = new Trie()
+
+            //向字典中插入100000条随机字符
+            for(let i = 0 ;i < 10000;i++){
+                trie.insert(createRandomStr(4))
+            }
+            let {frequent,maxWord} =  trie.most()
+         document.getElementsByTagName('p')[0].innerText = `【字符】：${maxWord}\n【次数】：${frequent}`
+
+        }
+
+    </script>
+</body>
+</html>
