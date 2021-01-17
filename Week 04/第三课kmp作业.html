@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        //kmp算法一种字符串匹配算法，可以将时间复杂度降为m+n
+
+        //source原串，pattern模式串
+        //步骤：先计算出模式串有自重复的表格，当前位置前面都多少重复的
+        function kmp(source,pattern){
+            let table = new Array(pattern.length).fill(0)//记录自重复的表格
+
+            {
+                let i = 1 //比较索引
+            let j = 0;//重复次数
+            while(i < pattern.length){
+                if(pattern[i] === pattern[j]){//刚好匹配上,索引向后推进
+                    ++i;
+                    ++j
+                    table[i] = j
+                }else{
+                    if(j > 0){
+                        table[j] = j
+                    }else{
+                        ++i//推进
+                    }
+                }
+            }
+            }
+
+            {
+                let i = 0 ; j = 0
+                while(i < source.length){
+
+                    if(pattern[i] === source[i]){//匹配上，两个都自增
+                        ++i;
+                        ++j
+                    }else{
+                        if(j > 0){
+                            j = table[j]
+                        }else{
+                            ++i
+                        }
+                    }
+                    if(j === pattern.length)
+                        return true//模式串到头了
+                }
+                return false
+            }
+        }
+    </script>
+</body>
+</html>
