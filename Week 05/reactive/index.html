@@ -8,7 +8,7 @@
 <body>
    
 
-<input type="text" id="r" />
+<span id="r"></span>
 
 <script>
   let callbacks = new Map();
@@ -16,22 +16,14 @@
   let usedReactivities = [];
 
   let object = {
-    r: 1,
+    v: 1
   };
 
   let po = reactive(object);
-  
-  // 加入一个监听事件
   effect(() => {
-    // 加入了单向数据绑定
-    document.getElementById('r').value = po.r;
+    document.getElementById('r').innerText = po.v;
   });
 
-  /**
-     * effect 函数
-     * @param {Function} callback 回调函数
-     * @return void
-     */
   function effect(callback) {
     usedReactivities = [];
     callback();
@@ -49,33 +41,28 @@
     }
   }
 
-  /**
-     * reactive 相应函数
-     * @param {Object} object
-     * @return Object
-     */
   function reactive(object) {
     if (reactivities.has(object)) return reactivities.get(object);
 
     let proxy = new Proxy(object, {
-      // 对象赋值
+      
       set(obj, prop, val) {
         obj[prop] = val;
 
         if (callbacks.get(obj))
           if (callbacks.get(obj).get(prop))
-            // 调用所有监听回调函数
+            
             for (let callback of callbacks.get(obj).get(prop)) {
               callback();
             }
 
         return obj[prop];
       },
-      // 对象取值
+    
       get(obj, prop) {
         usedReactivities.push([obj, prop]);
 
-        if (typeof obj[prop] === 'object') return reactive(obj[prop]);
+        if (typeof obj[prop] == 'object') return reactive(obj[prop]);
 
         return obj[prop];
       },
