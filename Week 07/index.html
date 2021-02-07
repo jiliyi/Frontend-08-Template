@@ -5,31 +5,23 @@
     <title></title>
 </head>
 <body>
-<div id="mountNode"></div>
+<div id="graph"></div>
 
 <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.7.1/dist/g6.min.js"></script>
 <script>
-    const getIntrinsicObjects = () => {
-        const set = new Set();
-        const objects = [eval, isFinite, isNaN, parseFloat, parseInt, decodeURI, decodeURIComponent, encodeURI,
+    let objects = [eval, isFinite, isNaN, parseFloat, parseInt, decodeURI, decodeURIComponent, encodeURI,
             encodeURIComponent, Array, Date, RegExp, Promise, Proxy, Map, WeakMap, Set, WeakSet, Function, Boolean,
             String, Number, Symbol, Object, Error, EvalError, RangeError, ReferenceError, SyntaxError, TypeError,
             URIError, ArrayBuffer, SharedArrayBuffer, DataView, Float32Array, Float64Array, Int8Array, Int16Array,
-            Int32Array, Uint8Array, Uint16Array, Uint32Array, Uint8ClampedArray, 'Atomics', 'JSON', 'Math', 'Reflect    '];
-        objects.forEach(o => set.add(o));
-        return set;
-    };
-
-    const getGraphData = () => {
-        const objects = Array.from(getIntrinsicObjects());
-        const getName = (obj) => (typeof obj === 'string' ? obj : obj.name);
+            Int32Array, Uint8Array, Uint16Array, Uint32Array, Uint8ClampedArray];
+    let getData = () => {
         let nodes = objects.map((obj) => ({
-            id: getName(obj),
-            label: getName(obj),
+            id: obj.name,
+            label: obj.name,
         }));
         nodes = [...nodes, { id: 'root', label: 'realm'}];
         const edges = objects.map((obj) => ({
-            source: getName(obj),
+            source: obj.name,
             target: 'root'
         }));
         return {
@@ -37,23 +29,36 @@
             edges
         }
     };
-
-    const main = () => {
+let data = getData()
         const graph = new G6.Graph({
-            container: 'mountNode',
-            width: 1920,
-            height: 1080,
+            container: 'graph',
+            width: window.innerWidth,
+            height: window.innerHeight,
+            defaultNode:{
+                type : 'rect',
+                style : {
+                    width : 100,
+                    height : 30,
+                    radius : 4,
+                    fill:"#ecf6fc",
+                    stroke : '#999'
+                },
+                lableCfg:{
+                    style : {
+                        fontSize:14
+                    }
+                },
+            },
+            defaultEdge:{
+                type : 'left-tree'
+            },
             layout: {
                 type: 'circular',
-                divisions: 5,
                 ordering: 'degree',
-                angleRatio: 1,
             },
         });
-        graph.data(getGraphData());
+        graph.data(data);
         graph.render();
-    };
-    main();
 </script>
 </body>
 </html>
