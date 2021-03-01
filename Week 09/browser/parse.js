@@ -3,37 +3,30 @@ const css = require("css");
 let currentToken = null;
 let currentAttribute = null;
 
-let stack = [{ type: "document", children:[] }]; // 根节点
+let stack = [{ type: "document", children:[] }]; 
 let currentTextNode = null;
 
-// 加入一个新函数，addCSSRules，这里把CSS规则暂存到一个数组里面
 let rules = [];
 function addCSSRules(text) {
-   var ast = css.parse(text); // 解析成抽象语法书ast
+   var ast = css.parse(text); 
    console.log('ast:', JSON.stringify(ast));
    rules.push(...ast.stylesheet.rules);
 
 }
 function computedCSS(element) {
-    // console.log('rules:', rules);
-    // console.log('computed CSS for Element:', element);
     let elements = stack.slice().reverse();
 
     if(!element.computedStyle) {
         element.computedStyle = {};
     }
     for (let rule of rules) {
-       //  正式来说，selectorPart里面都是复合选择器，简单假设是一个简单选择器
        let selectorParts = rule.selectors[0].split(" ").reverse();
 
        if(!match(element, selectorParts[0])) {
            continue;
        }
        let matched = false; 
-       // 难点
-       let j = 1;  // 当前选择器的位置
        for (let i = 0; i < elements.length; i++) {
-           // i 表示当前元素的位置 
            if(match(elements[i], selectorParts[j])) {
                j++;
            }
@@ -42,8 +35,7 @@ function computedCSS(element) {
            matched = true;
        }
        if(matched) {
-           // 如果匹配到我们要加入
-           //    console.log("Element:", element, "matched rule", rule);
+          
            let sp = specificity(rule.selectors[0]);
            let computedStyle = element.computedStyle;
            for (let declaration of rule.declarations) {
@@ -54,7 +46,6 @@ function computedCSS(element) {
                 computedStyle[declaration.property].value = declaration.value;
                 computedStyle[declaration.property].specificity = sp;
                } else if(compare(computedStyle[declaration.property].specificity, sp)< 0) {
-                // 旧的更小，新的覆盖   
                 computedStyle[declaration.property].value = declaration.value;
                 computedStyle[declaration.property].specificity = sp;                   
                }
@@ -65,9 +56,7 @@ function computedCSS(element) {
     }
 }
 
-// 简单选择器selector div .a #a  三种选择器 复合选择器，正则拆分
 function match(element, selector) {
-  // 判断是否为为本节点  
   if(!selector || !element.attributes) {
       return false;
   }
@@ -118,8 +107,7 @@ function compare(sp1, sp2) {
 
 }
 function emit(token) {
-    // console.log('token:', token);
-    let top = stack[stack.length-1]; // 栈顶元素
+    let top = stack[stack.length-1]; 
     if(token.type === "startTag") {
       let element = {
           type: "element",
@@ -136,7 +124,7 @@ function emit(token) {
               
           }
       }
-      // 计算CSS时机，计入startTag的时候
+     
       computedCSS(element);
 
       top.children.push(element);
@@ -149,7 +137,7 @@ function emit(token) {
         if(top.tagName !== token.tagName) {
             throw new Error("Tag Start end doesn't match!");
         }else {
-            // 结束标签时处理：遇到style标签时，执行添加css规则的操作
+            
             if(top.tagName === "style") {
                 addCSSRules(top.children[0].content);
             }
@@ -172,7 +160,7 @@ const EOF = Symbol("EOF"); // EOF: End of File
 
 function data(c) {
   if(c === "<") {
-      return tagOpen; // 标签开始，不是开始标签
+      return tagOpen; 
   }else if(c === EOF) {
       emit({
           type: "EOF",
@@ -207,15 +195,12 @@ function endTagOpen(c) {
         }        
         return tagName(c);
     } else if(c === ">") {
-       // 报错
 
     } else if(c === EOF) {
-       // 报错
     } else {
 
     }  
 }
-// <html prop  <html/>
 function tagName(c) {
     if(c.match(/^[\t\n\f ]$/)) {
         return beforeAttributeName;
@@ -226,12 +211,11 @@ function tagName(c) {
         return tagName;
     } else if(c === ">"){
         emit(currentToken);
-        return data; // 解析下一个标签
+        return data; 
     } else {
        return tagName; 
     }     
 }
-// <html maaa = a >
 function beforeAttributeName(c) {
     if(c.match(/^[\t\n\f ]$/)) {
         return beforeAttributeName;
@@ -262,7 +246,6 @@ function attributeName(c) {
     } 
 }
 function beforeAttributeValue(c) {
-    // four condition
     if(c.match(/^[\t\n\f ]$/) || c === "/" || c === ">" || c === EOF) {
         return beforeAttributeValue;
     } else if(c === "\""){
@@ -364,16 +347,14 @@ function afterAttributeName(c) {
 function selfClosingStartTag(c) {
     if(c === ">") {
         currentToken.isSelfClosing = true;
-        emit(currentToken);   // 课上代码漏了emit
+        emit(currentToken);   
         return data;
     } else if(c === EOF) {
-        // 报错
     } else {
-        // 报错
     }
 }
 module.exports.parseHTML = function parseHTML(html) {
-    // 状态机
+  
     let state = data;
     for (let c of html) {
         state = state(c);
