@@ -1,4 +1,5 @@
 const net = require("net");
+const parser = require('./parse.js')
 class Request {
   constructor(options) {
     this.method = options.method || "GET";
@@ -221,4 +222,5 @@ void (async function () {
 
   let response = await request.send();
   console.log(response);
+  let dom = parser.parseHTML(response.body);
 })();
