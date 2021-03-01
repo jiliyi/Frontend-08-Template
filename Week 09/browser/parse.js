@@ -1,4 +1,3 @@
-
 const css = require("css");
 let currentToken = null;
 let currentAttribute = null;
