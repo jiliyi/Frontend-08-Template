@@ -207,5 +207,6 @@ void async function(){
     })
     let response = await request.send()
     // console.log('mubiao',response.content)
-    let body = parser.parseHTML(response.content)
+    let dom = parser.parseHTML(response.content)
+    console.log(dom)
 }()
