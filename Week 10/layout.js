@@ -25,13 +25,13 @@ function layout (element) {
         return;
     }
     let elementStyle = getStyle(element);
-    if (elementStyle.display !== 'flex') {
-        return;// 目前仅处理flex
+    if (elementStyle.display !== 'flex') {//只处理flex
+        return;
     }
     let items = element.children.filter(one => one.type === 'element');
 
     items.sort(function (a, b) {
-        return (a.order || 0) - (b.order || 0);// "/"
+        return (a.order || 0) - (b.order || 0);
     });
 
     let style = elementStyle;
@@ -136,9 +136,7 @@ function layout (element) {
         isAutoMainSize = true;
     }
 
-    /**
-     * 入行
-     */
+    
     let flexLine = [];
     let flexLines = [flexLine];
     let mainSpace = elementStyle[mainSize];
@@ -182,7 +180,7 @@ function layout (element) {
             }
         }
     }
-    flexLine.mainSpace = mainSpace;// 最后一行结尾的特殊情况
+    flexLine.mainSpace = mainSpace;
 
     if (style.flexWrap === 'nowrap' || isAutoMainSize) {
         flexLine.crossSpace = (style[crossSize] !== undefined) ? style[crossSize] : crossSpace;
@@ -190,16 +188,14 @@ function layout (element) {
         flexLine.crossSpace = crossSpace;
     }
 
-    /**
-     * 计算主轴
-     */
-    if (mainSpace < 0) { // 单行的逻辑，多行不会小于0，在这里等同于最后一行,此处的mainSpace延续了last for 处理过的值
+   
+    if (mainSpace < 0) { 
         let scale = style[mainSize] / (style[mainSize] - mainSpace);
         let currentMain = mainBase;
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             let itemStyle = getStyle(item);
-            if (itemStyle.flex) { // flex直接置0
+            if (itemStyle.flex) { 
                 itemStyle[mainSize] = 0;
             }
             itemStyle[mainSize] = itemStyle[mainSize] * scale;
@@ -207,7 +203,6 @@ function layout (element) {
             itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
         }
     } else {
-        // process each flex line,会换行的情况
         flexLines.forEach(items => {
             let mainSpace = items.mainSpace;
             let flexTotal = 0;
@@ -236,7 +231,7 @@ function layout (element) {
                 }
             } else {
                 let currentMain, step;
-                // There is *No* flexiable items,which mean,justifyContent should work
+              
                 if (style.justifyContent === 'flex-start') {
                     currentMain = mainBase;
                     step = 0;
@@ -270,18 +265,15 @@ function layout (element) {
         });
     }
 
-    /**
-     * 计算交叉轴
-     * align-items, align-self
-     */
-    if (!style[crossSize]) { // auto sizing
-        crossSpace = 0;// 剩余肯定是0
+
+    if (!style[crossSize]) { 
+        crossSpace = 0;
         elementStyle[crossSize] = 0;
         for (let i = 0; i < flexLines.length; i++) {
             elementStyle[crossSize] = elementStyle[crossSize] + flexLines[i].crossSpace;
         }
     } else {
-        crossSpace = style[crossSize];// 累减得到剩余
+        crossSpace = style[crossSize];
         for (let i = 0; i < flexLines.length; i++) {
             crossSpace -= flexLines[i].crossSpace;
         }
@@ -327,11 +319,9 @@ function layout (element) {
 
             let align = itemStyle.alignSelft || style.alignItems;
 
-            // if (itemStyle[crossSize] === null) { // winter 代码
-            //     itemStyle[crossSize] = (align === 'stretch' ? lineCrossSize : 0);
-            // }
+     
 
-            if (!itemStyle[crossSize]) { // leo 代码
+            if (!itemStyle[crossSize]) { 
                 itemStyle[crossSize] = (align === 'stretch' ? lineCrossSize : 0);
             }
 
@@ -352,7 +342,6 @@ function layout (element) {
             if (align === 'stretch') {
                 itemStyle[crossStart] = crossBase;
                 itemStyle[crossEnd] = itemStyle[crossStart] + crossSign * ((itemStyle[crossSize] !== null && itemStyle[crossSize] !== 0) ? itemStyle[crossSize] : lineCrossSize);// winter 此处代码没有看清
-                // itemStyle[crossEnd] = itemStyle[crossStart] + crossSign * lineCrossSize;// 这样应该更直接
 
                 itemStyle[crossSize] = crossSign * (itemStyle[crossEnd] - itemStyle[crossStart]);
             }
