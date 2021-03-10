@@ -17,3 +17,16 @@ JavaScript 有 18437736874454810627( 2^64-2^53+3) 个值。
 
 - String
 String 表示文本数据,
+
+
+<MultiplicativeExpression>::=
+ <Number>|
+ <MultiplicativeExpression>"*"<Number>|
+ <MultiplicativeExpression>"/"<Number>
+
+ 
+<AdditiveExpression>::=
+ <AdditiveExpression>"+"<MultiplicativeExpression>|
+ <AddtiveExpression>"-"<MultiplicativeExpression>|
+ <MultiplicativeExpression>|
+ "("<AddtiveExpression>")"
