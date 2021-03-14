@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="cla3 cla4" id="id2">
+        <div class="cla1 cla2" id="id1"></div>
+    </div>
+    <script>
+        function match(selector,element){
+            
+        }
+        //选择器中没有写父元素,辅助函数
+        function matchSingle(selector,element){
+            const idReg = /(?<=#)\w+/g;//匹配id
+            const classReg = /(?<=\.)\w+/g //匹配class
+            const tagReg = /(?<=\s)[\w]+|^[\w]+/g //匹配tag
+            let id = selector.match(idReg)
+            let clas = selector.match(classReg)
+            let tag = selector.match(tagReg)
+            
+            
+            let elementClassList = b = element.classList;
+            let elementId = element.id;
+            let elementTag  = element.tagName.toLowerCase()
+            // console.log(elementClassList)
+            if(tag && tag[0] !== elementTag){
+                return false
+            }
+            if(id && id[0] !== elementId){
+                return  false
+            }
+
+            let matchClass = true
+            if(clas){
+                for(let cla of clas){
+                  if(  Array.prototype.slice.call(b).indexOf(cla) < 0){
+                        matchClass = false
+                  }
+                }
+            }
+            if(!matchClass){
+                return false
+            }
+            return true
+        }
+        let dom =  document.getElementById('id1')
+        matchSingle('div#id1.cla1 ',dom)
+    </script>
+</body>
+</html>
