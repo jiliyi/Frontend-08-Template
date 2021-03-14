@@ -11,10 +11,27 @@
     </div>
     <script>
         function match(selector,element){
+
+            let selectorArr =  selector.split(/ |\n|f|\t/).reverse()
             
+            // console.log(selectorArr)
+
+            
+            while(selectorArr.length > 0 ){
+                
+                 let currentSelector = selectorArr[0];
+                  selectorArr.shift()
+                // debugger
+                 if(!matchSingle(currentSelector,element)){
+                     return false
+                 }
+                 element = element.parentElement;
+            }
+            return true
         }
         //选择器中没有写父元素,辅助函数
         function matchSingle(selector,element){
+            
             const idReg = /(?<=#)\w+/g;//匹配id
             const classReg = /(?<=\.)\w+/g //匹配class
             const tagReg = /(?<=\s)[\w]+|^[\w]+/g //匹配tag
@@ -23,7 +40,7 @@
             let tag = selector.match(tagReg)
             
             
-            let elementClassList = b = element.classList;
+            let elementClassList  = element.classList;
             let elementId = element.id;
             let elementTag  = element.tagName.toLowerCase()
             // console.log(elementClassList)
@@ -37,7 +54,7 @@
             let matchClass = true
             if(clas){
                 for(let cla of clas){
-                  if(  Array.prototype.slice.call(b).indexOf(cla) < 0){
+                  if(  Array.prototype.slice.call(elementClassList).indexOf(cla) < 0){
                         matchClass = false
                   }
                 }
@@ -47,8 +64,8 @@
             }
             return true
         }
-        let dom =  document.getElementById('id1')
-        matchSingle('div#id1.cla1 ',dom)
+
+        match('#id2.cla3 div#id1.cla1',document.querySelector('#id1'))
     </script>
 </body>
 </html>
