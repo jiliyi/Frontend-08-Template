@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+        function filterOut(names,props){
+            let set = new Set();
+            props.forEach(prop=>set.add(prop))
+            return names.filter(prop=>!set.has(prop))
+        }
+    
+        let names = Object.getOwnPropertyNames(window)
+
+        //ECMA 262
+        {
+            let js =  ["Object", "Function", "Array", "Number", "parseFloat", "parseInt", "Infinity", "NaN", "undefined", "Boolean", "String", "Symbol", "Date", "Promise", "RegExp", "Error", "AggregateError", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError", "globalThis", "JSON", "Math", "console", "ArrayBuffer", "Uint8Array", "Int8Array", "Uint16Array", "Int16Array", "Uint32Array", "Int32Array", "Float32Array", "Float64Array", "Uint8ClampedArray", "BigUint64Array", "BigInt64Array", "DataView", "Map", "BigInt", "Set", "WeakMap", "WeakSet", "Proxy", "Reflect", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "escape", "unescape", "eval", "isFinite", "isNaN"]
+            names = filterOut(names,js)
+        }
+
+
+        //class of Node
+        names = names.filter(prop=>{
+                try {
+                    return  !(window[prop].prototype instanceof Node)
+                } catch (error) {
+                    return true
+                }
+            })
+        
+        //event
+        names = names.filter(prop=>!prop.match(/^on/))
+        
+        //webkit private
+        names = names.filter(prop => !prop.match(/^webkit/))
+        
+        //window
+        {
+            let wind = ['window', 'self', 'document', 'name', 'location', 'customElements','locationbar', 'menubar',  'personalbar', 'scrollbars',  'statusbar', 'toolbar',  'status', 'closed',  'frames', 'length',  'top', 'opener', 'parent', 'frameElement', 'Navigator', 'navigator','originAgentCluster', 'external', 'alert', 'confirm', 'prompt', 'print', 'close', 'stop', 'focus', 'blur',"origin","screen","scrollX","pageXOffset","scrollY","pageYOffset","visualViewport","screenX","screenY","outerWidth","outerHeight","devicePixelRatio","clientInformation","offscreenBuffering","screenLeft","screenTop","defaultStatus","defaultstatus","styleMedia","crypto","atob","cancelAnimationFrame","cancelIdleCallback","captureEvents","clearInterval","clearTimeout","createImageBitmap","fetch","find","getComputedStyle","getSelection","matchMedia","moveBy","moveTo","open","postMessage","queueMicrotask","releaseEvents","requestAnimationFrame","requestIdleCallback","resizeBy","resizeTo","scroll","scrollBy","scrollTo","setInterval","setTimeout","AggregateError","FinalizationRegistry","chrome","caches","cookieStore", 'CookieStore']
+            names = filterOut(names,wind)
+        }
+
+        //https://html.spec.whatwg.org/
+        {
+            let win = ["ApplicationCache", "AudioTrack", "AudioTrackList", "BarProp", "BeforeUnloadEvent", "BroadcastChannel", "CanvasGradient", "CanvasPattern", "CanvasRenderingContext2D", "CloseEvent", "CustomElementRegistry", "DOMStringList", "DOMStringMap", "DataTransfer", "DataTransferItem", "DataTransferItemList", "DedicatedWorkerGlobalScope", "Document", "DragEvent", "ErrorEvent", "EventSource", "External", "FormDataEvent", "HTMLAllCollection", "HashChangeEvent", "History", "ImageBitmap", "ImageBitmapRenderingContext", "ImageData", "Location", "MediaError", "MessageChannel", "MessageEvent", "MessagePort", "MimeType", "MimeTypeArray", "Navigator", "OffscreenCanvas", "OffscreenCanvasRenderingContext2D", "PageTransitionEvent", "Path2D", "Plugin", "PluginArray", "PopStateEvent", "PromiseRejectionEvent", "RadioNodeList", "SharedWorker", "SharedWorkerGlobalScope", "Storage", "StorageEvent", "TextMetrics", "TextTrack", "TextTrackCue", "TextTrackCueList", "TextTrackList", "TimeRanges", "TrackEvent", "ValidityState", "VideoTrack", "VideoTrackList", "WebSocket", "Window", "Worker", "WorkerGlobalScope", "WorkerLocation", "WorkerNavigator"];
+            names = filterOut(names,win)
+        }
+
+        //http://www.ecma-international.org/ecma-402/5.0/index.html#Title
+        names = names.filter(prop => prop != "Intl")
+
+        //https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15
+        names = filterOut(names, ["WebGLVertexArrayObject","WebGLTransformFeedback","WebGLSync","WebGLSampler","WebGLQuery","WebGL2RenderingContext","WebGLContextEvent","WebGLObject", "WebGLBuffer", "WebGLFramebuffer", "WebGLProgram", "WebGLRenderbuffer", "WebGLShader", "WebGLTexture", "WebGLUniformLocation", "WebGLActiveInfo", "WebGLShaderPrecisionFormat", "WebGLRenderingContext"]);
+
+        //https://www.w3.org/TR/webaudio/
+        names = filterOut(names, ["AudioContext", "AudioNode", "AnalyserNode", "AudioBuffer", "AudioBufferSourceNode", "AudioDestinationNode", "AudioParam", "AudioListener", "AudioWorklet", "AudioWorkletGlobalScope", "AudioWorkletNode", "AudioWorkletProcessor", "BiquadFilterNode", "ChannelMergerNode", "ChannelSplitterNode", "ConstantSourceNode", "ConvolverNode", "DelayNode", "DynamicsCompressorNode", "GainNode", "IIRFilterNode", "MediaElementAudioSourceNode", "MediaStreamAudioSourceNode", "MediaStreamTrackAudioSourceNode", "MediaStreamAudioDestinationNode", "PannerNode", "PeriodicWave", "OscillatorNode", "StereoPannerNode", "WaveShaperNode", "ScriptProcessorNode", "AudioProcessingEvent"]);
+
+        //https://encoding.spec.whatwg.org/#dom-textencoder
+        names = filterOut(names, ["TextDecoder", "TextEncoder", "TextDecoderStream", "TextEncoderStream"]);
+
+
+        //https://streams.spec.whatwg.org/#blqs-class
+        names = filterOut(names, ["ReadableStream", "ReadableStreamDefaultReader", "ReadableStreamBYOBReader", "ReadableStreamDefaultController", "ReadableByteStreamController", "ReadableStreamBYOBRequest", "WritableStream", "WritableStreamDefaultWriter", "WritableStreamDefaultController", "TransformStream", "TransformStreamDefaultController", "ByteLengthQueuingStrategy", "CountQueuingStrategy"]);
+
+
+
+        //https://wicg.github.io/BackgroundSync/spec/#sync-manager-interface
+        names = filterOut(names, ["SyncManager"]);
+
+        //https://xhr.spec.whatwg.org/
+        //xhr
+        {
+            let xhr = ["XMLHttpRequest","ProgressEvent","XMLHttpRequestEventTarget","XMLHttpRequestUpload","XMLHttpRequest","XMLHttpRequestEventTarget","XMLHttpRequestUpload",,"FormData"]
+            names = filterOut(names,xhr)
+        }
+
+        //https://www.w3.org/TR/webaudio/#audioapi
+        {
+            // let audio = ['BaseAudioContext', 'AudioContext', 'OfflineAudioContext', 'AudioBuffer','AudioNode', 'AudioParam', 'AudioScheduledSourceNode', 'AnalyserNode', 'AudioBufferSourceNode', 'AudioDestinationNode','AudioListener', 'BiquadFilterNode', 'ChannelMergerNode', 'ChannelSplitterNode', 'ConstantSourceNode','ConvolverNode', 'DelayNode', 'DynamicsCompressorNode', 'GainNode', 'IIRFilterNode', 'MediaElementAudioSourceNode','MediaStreamAudioDestinationNode', 'MediaStreamAudioSourceNode', 'MediaStreamTrackAudioSourceNode','OscillatorNode', 'PannerNode', 'PeriodicWave', 'ScriptProcessorNode', 'StereoPannerNode','WaveShaperNode', 'AudioWorklet', 'AudioWorkletNode']
+            // names = filterOut(names,audio)
+        }
+
+        https://url.spec.whatwg.org/
+        names = filterOut(names,['URL', "URLSearchParams"])
+
+        //https://w3c.github.io/webrtc-pc/#dom-rtctrackevent
+        {
+          let rtc = ['RTCIceTransport', "RTCTrackEvent","RTCStatsReport","RTCSessionDescription","RTCSctpTransport","RTCRtpTransceiver","RTCRtpSender","RTCRtpReceiver","RTCPeerConnectionIceEvent","RTCPeerConnectionIceErrorEvent","RTCPeerConnection","RTCIceCandidate","RTCErrorEvent","RTCError","RTCEncodedVideoFrame","RTCEncodedAudioFrame","RTCDtlsTransport","RTCDataChannelEvent","RTCDataChannel","RTCDTMFToneChangeEvent","RTCDTMFSender","RTCCertificate"] 
+          names = filterOut(names,rtc )
+
+        }
+
+        // https://w3c.github.io/mediacapture-main/#dom-mediadeviceinfo
+        {
+            let media = ["MediaStreamTrack","MediaStreamEvent","MediaStream","MediaRecorder","MediaQueryListEvent","MediaQueryList","MediaList","MediaError","MediaEncryptedEvent","MediaCapabilities","MediaDeviceInfo","MediaDevices","MediaKeyMessageEvent","MediaKeySession","MediaKeyStatusMap","MediaKeySystemAccess","MediaKeys" ,'MediaStreamTrackEvent']
+            names = filterOut(names,media)
+        }
+
+        //https://developer.mozilla.org/en-US/docs/Web/API
+        {
+            let svg = ["SVGUnitTypes","SVGTransformList","SVGTransform","SVGStringList","SVGRect","SVGPreserveAspectRatio","SVGPointList","SVGPoint","SVGNumberList","SVGNumber","SVGMatrix","SVGLengthList","SVGLength","SVGAnimatedTransformList","SVGAnimatedString","SVGAnimatedRect","SVGAnimatedPreserveAspectRatio","SVGAnimatedNumberList","SVGAnimatedNumber","SVGAnimatedLengthList","SVGAnimatedLength","SVGAnimatedInteger","SVGAnimatedEnumeration","SVGAnimatedBoolean","SVGAnimatedAngle","SVGAngle"]
+            names = filterOut(names,svg)
+        }
+
+        //https://developer.mozilla.org/en-US/docs/Web/API
+        {
+            let perfor = [ "PerformanceTiming", "PerformanceServerTiming", "PerformanceResourceTiming", "PerformancePaintTiming", "PerformanceObserverEntryList", "PerformanceObserver", "PerformanceNavigationTiming", "PerformanceNavigation", "PerformanceMeasure", "PerformanceMark", "PerformanceLongTaskTiming", "PerformanceEventTiming", "PerformanceEntry", "PerformanceElementTiming", "Performance"]
+            names = filterOut(names,perfor)
+        }
+
+        //https://developer.mozilla.org/en-US/docs/Web/API
+        {
+            let dom = ['DOMPoint','DOMTokenList','DOMRectReadOnly','DOMRectList','DOMRect','DOMQuad','DOMPointReadOnly','DOMParser','DOMMatrixReadOnly','DOMMatrix','DOMImplementation','DOMException','DOMError']
+            names = filterOut(names,dom)
+        }
+        {
+            let mid = ["MIDIAccess","MIDIConnectionEvent","MIDIInput","MIDIInputMap","MIDIMessageEvent","MIDIOutput","MIDIOutputMap","MIDIPort"]
+            filterOut(names,mid)
+        }
+        console.log(names)
+</script>
+</body>
+</html>
