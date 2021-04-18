@@ -1,80 +1,17 @@
-import { createElement,Component } from './framework.js';
-import {TimeLine,Animation} from './animation.js'
-class Carousel extends Component{
-    constructor(){
-        super()
-        this.attributes = Object.create(null)
-    }
-    render(){
-        this.root = document.createElement('div');
-        this.root.className = 'carousel'
-        for(let record of this.attributes.src){
-            let child = document.createElement('div');
-            child.style.backgroundImage = `url(${record})`;
-            this.root.appendChild(child)
-        }
-        let curIndex = 0;
-        let children = this.root.children
-        let length = this.attributes.src.length;
-        let position = 0;
-        this.root.addEventListener("mousedown",event=>{
-             let startX = event.clientX;
-             let move=event=>{
-                 let x = event.clientX - startX
-                 let current = position - ((x - x % 500) / 500)
-                 for (let offset of [-1, 0, 1]) {
-                   let pos = current + offset
-                   pos = (pos + children.length) % children.length
-                   children[pos].style.transition = 'none'
-                   children[pos].style.transform = `translateX(${-pos * 500 + offset * 500 + x % 500}px)`
-                 }
-             }
-             let up = event=>{
-                 let x = event.clientX - startX
-                 position = position - Math.round(x / 500)
-                 for (let offset of [0, - Math.sign(Math.round(x / 500) - x + 250 * Math.sign(x))]) {
-                   let pos = position + offset
-                   pos = (pos + children.length) % children.length
-                   children[pos].style.transition = ''
-                   children[pos].style.transform = `translateX(${-pos * 500 + offset * 500}px)`
-                 }
-               document.removeEventListener("mousemove",move)
-                 document.removeEventListener("mouseup",up)
-             }
-             document.addEventListener("mousemove",move)
-             document.addEventListener("mouseup",up)
-        })
-        // setInterval(()=>{
-        //     let nextIndex = ( curIndex + 1 ) % length;
-        //     let current = children[curIndex];
-        //     let next = children[nextIndex];
-        //     next.style.transition = "none"
-        //     next.style.transform = `translateX(${100 -nextIndex * 100}%)`;
+import { Component, createElement } from "./framework.js";
+import { Carousel } from "./Carousel.js";
+import { Timeline, Animation } from "./animation.js";
 
-        //     setTimeout(()=>{
-        //         next.style.transition = "";
-        //         current.style.transform = `translateX(${-100 -curIndex * 100}%)`;
-        //         next.style.transform = `translateX(${0 - nextIndex * 100}%)`;
-        //         curIndex = nextIndex
-        //     },16)
-           
-        // },3000)
-        return this.root;
-    }
-    setAttribute(name,value){
-        this.attributes[name] = value
-    }
-    mountTo(parent){
-        parent.appendChild(this.render())
-    }
-}
+let imgs = [
+  {title:"t1", url:"https://www.baidu.com", img:"https://static001.geekbang.org/resource/image/65/9a/6590fb3f37a385b8d88b8679529e9c9a.jpg"},
+  {title:"t2", url:"https://www.taobao.com", img:"https://static001.geekbang.org/static/university/img/banner-bg-content@2x.38f12e0f.png"},
+  {title:"t3", url:"https://www.qq.com", img:"https://static001.geekbang.org/resource/image/7a/30/7a9547384cffa039f063db1fc7669a30.jpg"},
+  {title:"t4", url:"https://www.alipay.com", img:"https://static001.geekbang.org/resource/image/6a/9b/6aec0a09381a2f74014ec604ef99c19b.png"},
+  {title:"t5", url:"https://www.51job.com", img:"https://static001.geekbang.org/resource/image/cb/cb/cbb6d198ccfb95af4906eeb0581333cb.png"}
+];
 
-let d = ["https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
-    "https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg",
-    "https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg",
-    "https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg"]
-let c = <Carousel src={d}></Carousel>
-c.mountTo(document.body)
-let tl = new TimeLine()
-window.animation = new Animation({a : 1},'a',0,100,2000)
-window.tl =  tl
+let a = <Carousel src={imgs} 
+  onChange={event => console.log(event.detail.position) }
+  onClick={event => window.location.href = event.detail.data.url }></Carousel>;
+
+a.mountTo(document.body);

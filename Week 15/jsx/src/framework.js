@@ -1,44 +1,76 @@
-export  function createElement(type,attrs,...children){
-    let ele;
-    if(type instanceof Function){
-        ele = new type
-    }else{
-        ele = new ElementWrapper(type);
-    }
-    
-    //设置属性
-    for(let prop in attrs){
-        ele.setAttribute(prop,attrs[prop])
-    }
+export function createElement(type, attributes, ...children) {
 
-    for(let child of children){
-        if(typeof child === 'string'){
-            child = new TextElementWrapper(child)
+    console.log("type:", type);
+  
+    let element;
+    if (typeof type === "string") {
+      element = new ElementWrapper(type);
+    } else {
+      element = new type;
+    }
+    for (let name in attributes) {
+      element.setAttribute(name, attributes[name]);
+    }
+    let processChildren = (children) => {
+      for (let child of children) {
+        if ((typeof child === "object") && (child instanceof Array)) {
+          processChildren(child);
+          continue;
         }
-        ele.appendChild(child)
+        if (typeof child === "string") {
+          child = new TextWrapper(child);
+        }
+        element.appendChild(child);
+      }
+    };
+    processChildren(children);
+  
+    return element;
+  }
+  
+  export const STATE = Symbol("state");
+  export const ATTRIBUTE = Symbol("attribute");
+  
+  export class Component {
+    constructor(type) {
+      this[STATE] = Object.create(null);
+      this[ATTRIBUTE] = Object.create(null);
     }
-    return ele;
-}
-export class Component{
-    setAttribute(name,value){
-        this.root.setAttribute(name,value)
+    render() {
+      return this.root;
     }
-    appendChild(child){
-        child.mountTo(this.root)
+    setAttribute(name, value) {
+      this[ATTRIBUTE][name] = value;
     }
-    mountTo(parent){
-        parent.appendChild(this.root)
+    appendChild(child) {
+      child.mountTo(this.root);
     }
-}
-class ElementWrapper extends Component{
-    constructor(type){
-        super()
-        this.root = document.createElement(type)
+    mountTo(parent) {
+      if (!this.root) {
+        this.render();
+      }
+      parent.appendChild(this.root);
     }
-}
-class TextElementWrapper extends Component{
-    constructor(content){
-        super()
-        this.root = document.createTextNode(content)
+    triggerEvent(type, args) {
+      this[ATTRIBUTE]["on" + type.replace(/^[\s\S]/, (s) => s.toUpperCase())](
+        new CustomEvent(type, { detail: args })
+      );
     }
-}
+  }
+  
+  class ElementWrapper extends Component {
+    constructor(type) {
+      super();
+      this.root = document.createElement(type);
+    }
+    setAttribute(name, value) {
+      this.root.setAttribute(name, value);
+    }
+  }
+  
+  class TextWrapper extends Component {
+    constructor(content) {
+      super();
+      this.root = document.createTextNode(content);
+    }
+  }
