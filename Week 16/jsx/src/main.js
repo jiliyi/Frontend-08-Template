@@ -2,13 +2,18 @@ import { Component, createElement } from "./framework.js";
 import { Carousel } from "./Carousel.js";
 import { Timeline, Animation } from "./animation.js";
 
+
+
+
+
+
+
 let imgs = [
-  {title:"t1", url:"https://www.baidu.com", img:"https://static001.geekbang.org/resource/image/65/9a/6590fb3f37a385b8d88b8679529e9c9a.jpg"},
-  {title:"t2", url:"https://www.taobao.com", img:"https://static001.geekbang.org/static/university/img/banner-bg-content@2x.38f12e0f.png"},
-  {title:"t3", url:"https://www.qq.com", img:"https://static001.geekbang.org/resource/image/7a/30/7a9547384cffa039f063db1fc7669a30.jpg"},
-  {title:"t4", url:"https://www.alipay.com", img:"https://static001.geekbang.org/resource/image/6a/9b/6aec0a09381a2f74014ec604ef99c19b.png"},
-  {title:"t5", url:"https://www.51job.com", img:"https://static001.geekbang.org/resource/image/cb/cb/cbb6d198ccfb95af4906eeb0581333cb.png"}
-];
+  {title:"a", url:"https://video.kuaishou.com", img:"https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg"},
+  {title:"b", url:"https://www.douyin.com", img:"https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg"},
+  {title:"c", url:"https://www.weibo.com", img:"https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg"},
+  {title:"d", url:"https://www.qq.com", img:"https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg"}
+  ];
 
 let a = <Carousel src={imgs} 
   onChange={event => console.log(event.detail.position) }
