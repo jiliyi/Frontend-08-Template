@@ -1,88 +1,86 @@
-const http = require('http');
-const https = require('https')
-const fs = require('fs')
-const unzipper = require('unzipper')
-const qs = require('querystring')
+const http = require("http");
+const https = require("https");
+const unzipper = require("unzipper");
+const querystring = require("querystring");
 
 const client_id = 'Iv1.862d67b9cc855d00';
 const client_secret = '8fdedc352624418019733c7abd3956c2811136f2'
-//2 auth路由： 接受code 用code+client_id+client_secret换token
 
-function auth(req,res){
-    let query = qs.parse(req.url.match(/^\/auth\?([\s\S]+)$/)[1])
-    getToken(query.code,info=>{
-        res.write(`<a href='http://localhost:8083?token=${info.access_token}'>publish</a>`)
-        res.end()
-    })
+function auth(request, response) {
+  const query = querystring.parse(request.url.match(/^\/auth\?([\s\S]+)$/)[1]);
+  getToken(query.code, (info) => {
+    response.write(
+      `<a href="http://localhost:3002?token=${info.access_token}">publish</a>`
+    );
+    response.end();
+  });
 }
 
-function getToken(code,callback){
-    let request = https.request({
-        host : 'github.com',
-        port : 443,
-        method : 'POST',
-        path : `/login/oauth/access_token?code=${code}&client_id=${client_id}&client_secret=${client_secret}`
-    },res=>{
-        let body = '';
-        res.on('data',chunk=>{
-            body += (chunk.toString());            
-        })
-        res.on('end',()=>{
-            callback(qs.parse(body))
-        })
-    })
-    request.end()
-}
-
-function publish(req,res){
-    let query = qs.parse(req.url.match(/^\/publish\?([\s\S]+)$/)[1])
-
-    getUser(query.token,info=>{
-        if(info.login === 'jiliyi'){
-            
-            req.pipe(unzipper.Extract({ path: '../server/public/' }))
-            req.on('end',()=>{
-                res.end('success')
-            })
-        }
-    })
-
-    req.on('end',()=>{
-        res.end('success')
-    })
-}
-
-function getUser(token,callback){
-    let request = https.request({
-        host : 'api.github.com',
-        port : 443,
-        method : 'GET',
-        path : `/user`,
-        headers : {
-            Authorization: `token ${token}`,
-            'User-Agent' : 'toy-publishabc123'
-        }
-    },res=>{
-        let body = '';
-        res.on('data',chunk=>{
-            body += (chunk.toString());            
-        })
-        res.on('end',()=>{
-            callback(qs.parse(body))
-        })
-    })
-    request.end()
-}
-
-http.createServer((req,res)=>{
-    if(req.url.match(/^\/auth\?/)){
-        return auth(req,res)
-    }else if(req.url.match(/^\/publish\?/)){
-        return publish(req,res)
+function getToken(code, callback) {
+  const request = https.request(
+    {
+      hostname: "github.com",
+      port: 443,
+      path: `/login/oauth/access_token?client_id=${client_id}&client_secret=${client_secret}&code=${code}`,
+      method: "POST",
+    },
+    function (response) {
+      let body = "";
+      response.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      response.on("end", () => {
+        callback(querystring.parse(body));
+      });
     }
-    // let file = fs.createWriteStream('../server/public/tmp.zip')
-    // req.pipe(file)
-}).listen(8082)
+  );
+  request.end();
+}
 
-// fs.createReadStream('../server/public/tmp.zip')
-//   .pipe(unzipper.Extract({ path: './tem' }));
+function getUser(token, callback) {
+  const request = https.request(
+    {
+      hostname: "api.github.com",
+      port: 443,
+      path: '/user',
+      method: "GET",
+      headers: {
+        Authorization: `token ${token}`,
+        "User-Agent": "toy-publish"
+      },
+    },
+    function (response) {
+      let body = "";
+      response.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      response.on("end", () => {
+        callback(JSON.parse(body));
+      });
+    }
+  );
+  request.end();
+}
+
+function publish(request, response) {
+  const query = querystring.parse(request.url.match(/^\/publish\?([\s\S]+)$/)[1]);
+  getUser(query.token, (user) => {
+    if (user.login === "jiliyi"){
+      request.pipe(unzipper.Extract({ path: "../server/public" }));
+      request.on("end", () => {
+        response.end("success");
+      });
+    }
+  });
+}
+
+http
+  .createServer(function (request, response) {
+    if (request.url.match(/^\/auth\?/)) {
+      auth(request, response);
+    } else if (request.url.match(/^\/publish\?/)) {
+      publish(request, response);
+    }
+  })
+  .listen(8082);
+
