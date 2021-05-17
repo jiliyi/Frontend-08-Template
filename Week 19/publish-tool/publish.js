@@ -7,7 +7,8 @@ child_process.exec(`start https://github.com/login/oauth/authorize?client_id=${c
 
 
 http.createServer(function (request, response) {
-    const query = querystring.parse(request.url.match(/^\/\?([\s\S]+)$/)[1]);
+    const query = querystring.parse((request.url.match(/^\/\?([\s\S]+)$/))[1]);
+    console.log(query)
     publish(query.token);
     response.end("success");
   })

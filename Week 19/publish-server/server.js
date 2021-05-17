@@ -10,7 +10,7 @@ function auth(request, response) {
   const query = querystring.parse(request.url.match(/^\/auth\?([\s\S]+)$/)[1]);
   getToken(query.code, (info) => {
     response.write(
-      `<a href="http://localhost:3002?token=${info.access_token}">publish</a>`
+      `<a href="http://localhost:8083?token=${info.access_token}">publish</a>`
     );
     response.end();
   });
