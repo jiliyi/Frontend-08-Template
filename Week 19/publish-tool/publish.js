@@ -1,41 +1,65 @@
-const http = require("http");
-const archiver = require("archiver");
-const child_process = require("child_process");
-const querystring = require("querystring");
+let http = require("http");
+let fs = require("fs");
+let archiver = require("archiver");
+let child_process = require("child_process");
+let querystring = require('querystring');
+
 const client_id = 'Iv1.862d67b9cc855d00';
-child_process.exec(`start https://github.com/login/oauth/authorize?client_id=${client_id}`);
 
+//1打开 https://github.com/login/oauth/authorize
+child_process.exec(`start https://github.com/login/oauth/authorize?client_id=${client_id}`)
 
-http.createServer(function (request, response) {
-    const query = querystring.parse((request.url.match(/^\/\?([\s\S]+)$/))[1]);
-    console.log(query)
+//3创建server,接受token,后点击发布
+http.createServer(function(request, response) {
+    let query = querystring.parse(request.url.match(/^\/\?([\s\S]+)$/)[1]);
     publish(query.token);
-    response.end("success");
-  })
-  .listen(8083);
+   
+}).listen(8083);
 
 function publish(token) {
-  const request = http.request(
-    {
-      hostname: "127.0.0.1",
-      port: 8082,
-      method: "POST",
-      path: `/publish?token=${token}`,
-      headers: {
-        "Content-Type": "application/octet-stream",
-      },
-    },
-    (response) => {
-      response.on("end", () => {
-        response.end();
-      });
-    }
-  );
-
-  const archive = archiver("zip", {
-    zlib: { level: 9 }, // Sets the compression level.
-  });
-  archive.directory("./sample/", false);
-  archive.pipe(request); 
-  archive.finalize(); 
+   
+        let request = http.request({
+            hostname: "127.0.0.1",
+            port: 8082,
+            method: "POST",
+            path: '/publish?token=' + token,
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            }
+        }, response => {
+            console.log(response);
+        })
+        
+       
+        // let file = fs.createReadStream("./sample.html");
+    
+        const archive = archiver('zip', {
+            zlib: { level: 9 } // Sets the compression level.
+        });
+        archive.directory('./sample/', false);
+        archive.finalize();
+    
+        
+        // archive.pipe(fs.createWriteStream('tmp.zip'));
+    
+        
+        archive.pipe(request);
+        
+       
+        // file.pipe(request);
+        // file.on('end', () => request.end())
+    
 }
+
+
+
+
+// file.on('data', chunk => {
+//     console.log(chunk.toString());
+//     request.write(chunk);
+// })
+//  
+// file.on('end', chunk => {
+//     console.log("read finished");
+//     request.end(chunk);
+// })
